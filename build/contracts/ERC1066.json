@@ -1,0 +1,169 @@
+{
+  "contractName": "ERC1066",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"custom:security-contact\":\"soporte@comunyt.com\",\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/ERC1066.sol\":\"ERC1066\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/ERC1066.sol\":{\"keccak256\":\"0x964be964b1c8e16834ee8675186b2f9bc261f73960753cd6298e3cbfe930135c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a7ff2b2b978a8c1ecd0abf49b7e2401d3d5bed58daa5019a409cd799b3950b3e\",\"dweb:/ipfs/QmZZWGv1ezpDuRFJRzPP9K2xMT7h68BJSgBeMkpZnYhTPF\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220e2424a64b6a50bb70896eba8ec498403f154f99c4171a526c25e164dddf708c764736f6c63430008090033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220e2424a64b6a50bb70896eba8ec498403f154f99c4171a526c25e164dddf708c764736f6c63430008090033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "113:7090:12:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "113:7090:12:-:0;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.9;\r\n\r\n \r\n/// @custom:security-contact soporte@comunyt.com\r\ncontract ERC1066 {\r\n\r\n    // Uses status codes from ERC-1066\r\n    bytes1 internal  constant STATUS_DISALLOWED = 0x10;   // 0001 0000\r\n    bytes1 internal  constant STATUS_ALLOWED = 0x11;      // 0001 0001\r\n\r\n/*    \r\n    bytes1 internal  constant STATUS_INSUFICIENTFUNDS = 0x54 ;\r\n    bytes1 internal  constant STATUS_TRANSFERVOLUMEEXCEEDED = 0x56 ;\r\n\r\n    /// @dev ERC-1066 status codes encoded as human-readable enums\r\n    enum Status {\r\n\r\n        // 0x0*\r\n        Failure,\r\n        Success,\r\n        AwatingOthers,\r\n        Accepted,\r\n        LowerLimit,\r\n        RecieverActionRequested,\r\n        UpperLimit,\r\n        RESERVEDx07,\r\n        Inapplicable,\r\n        RESERVEDx09,\r\n        RESERVEDx0A,\r\n        RESERVEDx0B,\r\n        RESERVEDx0C,\r\n        RESERVEDx0D,\r\n        RESERVEDx0E,\r\n        Informational,\r\n\r\n        // 0x1*\r\n        Disallowed_Stop,\r\n        Allowed_Go,\r\n        AwaitingOthersPermission,\r\n        PermissionRequested,\r\n        TooOpen_Insecure,\r\n        NeedsYourPermission_RequestForContinuation,\r\n        Revoked_Banned,\r\n        RESERVEDx17,\r\n        NotApplicatableToCurrentState,\r\n        RESERVEDx19,\r\n        RESERVEDx1A,\r\n        RESERVEDx1B,\r\n        RESERVEDx1C,\r\n        RESERVEDx1D,\r\n        RESERVEDx1E,\r\n        PermissionDetails_ControlConditions,\r\n\r\n        // 0x2*\r\n        NotFound_Unequal_OutOfRange,\r\n        Found_Equal_InRange,\r\n        AwaitingMatch,\r\n        MatchRequestSent,\r\n        BelowRange_Underflow,\r\n        RequestForMatch,\r\n        Above_Range_Overflow,\r\n        RESERVEDx27,\r\n        Duplicate_Conflict_Collision,\r\n        RESERVEDx29,\r\n        RESERVEDx2A,\r\n        RESERVEDx2B,\r\n        RESERVEDx2C,\r\n        RESERVEDx2D,\r\n        RESERVEDx2E,\r\n        MatchingInformation,\r\n\r\n        // 0x3*\r\n        SenderDisagrees_Nay,\r\n        SenderAgrees_Yea,\r\n        AwaitingRatification,\r\n        OfferSent_Voted,\r\n        QuorumNotReached,\r\n        ReceiversRatificationRequested,\r\n        OfferOrVoteLimitReached,\r\n        RESERVEDx37,\r\n        AlreadyVoted,\r\n        RESERVEDx39,\r\n        RESERVEDx3A,\r\n        RESERVEDx3B,\r\n        RESERVEDx3C,\r\n        RESERVEDx3D,\r\n        RESERVEDx3E,\r\n        NegotiationRules_ParticipationInformation,\r\n\r\n        // 0x4*\r\n        Unavailable,\r\n        Available,\r\n        Paused,\r\n        Queued,\r\n        NotAvailableYet,\r\n        AwaitingYourAvailability,\r\n        Expired,\r\n        RESERVEDx47,\r\n        AlreadyDone,\r\n        RESERVEDx49,\r\n        RESERVEDx4A,\r\n        RESERVEDx4B,\r\n        RESERVEDx4C,\r\n        RESERVEDx4D,\r\n        RESERVEDx4E,\r\n        AvailabilityRules_Information,\r\n\r\n        // 0x5*\r\n        TransferFailed,\r\n        TransferSuccessful,\r\n        AwaitingPaymentFromOthers,\r\n        Hold_Escrow,\r\n        InsufficientFunds,\r\n        FundsRequested,\r\n        TransferVolumeExceeded,\r\n        RESERVEDx57,\r\n        FundsNotRequired,\r\n        RESERVEDx59,\r\n        RESERVEDx5A,\r\n        RESERVEDx5B,\r\n        RESERVEDx5C,\r\n        RESERVEDx5D,\r\n        RESERVEDx5E,\r\n        FinancialInformation,\r\n\r\n        // 0x6*\r\n        RESERVEDx60,\r\n        RESERVEDx61,\r\n        RESERVEDx62,\r\n        RESERVEDx63,\r\n        RESERVEDx64,\r\n        RESERVEDx65,\r\n        RESERVEDx66,\r\n        RESERVEDx67,\r\n        RESERVEDx68,\r\n        RESERVEDx69,\r\n        RESERVEDx6A,\r\n        RESERVEDx6B,\r\n        RESERVEDx6C,\r\n        RESERVEDx6D,\r\n        RESERVEDx6E,\r\n        RESERVEDx6F,\r\n\r\n        // 0x7*\r\n        RESERVEDx70,\r\n        RESERVEDx71,\r\n        RESERVEDx72,\r\n        RESERVEDx73,\r\n        RESERVEDx74,\r\n        RESERVEDx75,\r\n        RESERVEDx76,\r\n        RESERVEDx77,\r\n        RESERVEDx78,\r\n        RESERVEDx79,\r\n        RESERVEDx7A,\r\n        RESERVEDx7B,\r\n        RESERVEDx7C,\r\n        RESERVEDx7D,\r\n        RESERVEDx7E,\r\n        RESERVEDx7F,\r\n\r\n        // 0x8*\r\n        RESERVEDx80,\r\n        RESERVEDx81,\r\n        RESERVEDx82,\r\n        RESERVEDx83,\r\n        RESERVEDx84,\r\n        RESERVEDx85,\r\n        RESERVEDx86,\r\n        RESERVEDx87,\r\n        RESERVEDx88,\r\n        RESERVEDx89,\r\n        RESERVEDx8A,\r\n        RESERVEDx8B,\r\n        RESERVEDx8C,\r\n        RESERVEDx8D,\r\n        RESERVEDx8E,\r\n        RESERVEDx8F,\r\n\r\n        // 0x9*\r\n        RESERVEDx90,\r\n        RESERVEDx91,\r\n        RESERVEDx92,\r\n        RESERVEDx93,\r\n        RESERVEDx94,\r\n        RESERVEDx95,\r\n        RESERVEDx96,\r\n        RESERVEDx97,\r\n        RESERVEDx98,\r\n        RESERVEDx99,\r\n        RESERVEDx9A,\r\n        RESERVEDx9B,\r\n        RESERVEDx9C,\r\n        RESERVEDx9D,\r\n        RESERVEDx9E,\r\n        RESERVEDx9F,\r\n\r\n        // 0xA*\r\n        ApplicationSpecificFailure,\r\n        ApplicationSpecificSuccess,\r\n        ApplicationSpecificAwatingOthers,\r\n        ApplicationSpecificAccepted,\r\n        ApplicationSpecificLowerLimit,\r\n        ApplicationSpecificRecieverActionRequested,\r\n        ApplicationSpecificUpperLimit,\r\n        RESERVEDxA7,\r\n        ApplicationSpecific_Inapplicable,\r\n        RESERVEDxA9,\r\n        RESERVEDxAA,\r\n        RESERVEDxAB,\r\n        RESERVEDxAC,\r\n        RESERVEDxAD,\r\n        RESERVEDxAE,\r\n        ApplicationSpecificInformational,\r\n\r\n        // 0xB*\r\n        RESERVEDxB0,\r\n        RESERVEDxB1,\r\n        RESERVEDxB2,\r\n        RESERVEDxB3,\r\n        RESERVEDxB4,\r\n        RESERVEDxB5,\r\n        RESERVEDxB6,\r\n        RESERVEDxB7,\r\n        RESERVEDxB8,\r\n        RESERVEDxB9,\r\n        RESERVEDxBA,\r\n        RESERVEDxBB,\r\n        RESERVEDxBC,\r\n        RESERVEDxBD,\r\n        RESERVEDxBE,\r\n        RESERVEDxBF,\r\n\r\n        // 0xC*\r\n        RESERVEDxC0,\r\n        RESERVEDxC1,\r\n        RESERVEDxC2,\r\n        RESERVEDxC3,\r\n        RESERVEDxC4,\r\n        RESERVEDxC5,\r\n        RESERVEDxC6,\r\n        RESERVEDxC7,\r\n        RESERVEDxC8,\r\n        RESERVEDxC9,\r\n        RESERVEDxCA,\r\n        RESERVEDxCB,\r\n        RESERVEDxCC,\r\n        RESERVEDxCD,\r\n        RESERVEDxCE,\r\n        RESERVEDxCF,\r\n\r\n        // 0xD*\r\n        RESERVEDxD0,\r\n        RESERVEDxD1,\r\n        RESERVEDxD2,\r\n        RESERVEDxD3,\r\n        RESERVEDxD4,\r\n        RESERVEDxD5,\r\n        RESERVEDxD6,\r\n        RESERVEDxD7,\r\n        RESERVEDxD8,\r\n        RESERVEDxD9,\r\n        RESERVEDxDA,\r\n        RESERVEDxDB,\r\n        RESERVEDxDC,\r\n        RESERVEDxDD,\r\n        RESERVEDxDE,\r\n        RESERVEDxDF,\r\n\r\n        // 0xE*\r\n        DecryptFailure,\r\n        DecryptSuccess,\r\n        AwaitingOtherSignaturesOrKeys,\r\n        Signed,\r\n        Unsigned_Untrusted,\r\n        SignatureRequired,\r\n        KnownToBeCompromised,\r\n        RESERVEDxE7,\r\n        AlreadySigned_NotEncrypted,\r\n        RESERVEDxE9,\r\n        RESERVEDxEA,\r\n        RESERVEDxEB,\r\n        RESERVEDxEC,\r\n        RESERVEDxED,\r\n        RESERVEDxEE,\r\n        Cryptography_ID_ProofMetadata,\r\n\r\n        // 0xF*\r\n        OffChainFailure,\r\n        OffChainSuccess,\r\n        AwatingOffChainProcess,\r\n        OffChainProcessStarted,\r\n        OffChainServiceUnreachable,\r\n        OffChainActionRequired,\r\n        OffChainExpiry_LimitReached,\r\n        RESERVEDxF7,\r\n        DuplicateOffChainRequest,\r\n        RESERVEDxF9,\r\n        RESERVEDxFA,\r\n        RESERVEDxFB,\r\n        RESERVEDxFC,\r\n        RESERVEDxFD,\r\n        RESERVEDxFE,\r\n        OffChainInformation\r\n    }\r\n    */\r\n}",
+  "sourcePath": "/home/cryptocris/edIT/tokens/comtok/contracts/ERC1066.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/ERC1066.sol",
+    "exportedSymbols": {
+      "ERC1066": [
+        2454
+      ]
+    },
+    "id": 2455,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2446,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".9"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:12"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ERC1066",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 2447,
+          "nodeType": "StructuredDocumentation",
+          "src": "63:50:12",
+          "text": "@custom:security-contact soporte@comunyt.com"
+        },
+        "fullyImplemented": true,
+        "id": 2454,
+        "linearizedBaseContracts": [
+          2454
+        ],
+        "name": "ERC1066",
+        "nameLocation": "122:7:12",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 2450,
+            "mutability": "constant",
+            "name": "STATUS_DISALLOWED",
+            "nameLocation": "205:17:12",
+            "nodeType": "VariableDeclaration",
+            "scope": 2454,
+            "src": "179:50:12",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes1",
+              "typeString": "bytes1"
+            },
+            "typeName": {
+              "id": 2448,
+              "name": "bytes1",
+              "nodeType": "ElementaryTypeName",
+              "src": "179:6:12",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes1",
+                "typeString": "bytes1"
+              }
+            },
+            "value": {
+              "hexValue": "30783130",
+              "id": 2449,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "225:4:12",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_16_by_1",
+                "typeString": "int_const 16"
+              },
+              "value": "0x10"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2453,
+            "mutability": "constant",
+            "name": "STATUS_ALLOWED",
+            "nameLocation": "277:14:12",
+            "nodeType": "VariableDeclaration",
+            "scope": 2454,
+            "src": "251:47:12",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes1",
+              "typeString": "bytes1"
+            },
+            "typeName": {
+              "id": 2451,
+              "name": "bytes1",
+              "nodeType": "ElementaryTypeName",
+              "src": "251:6:12",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes1",
+                "typeString": "bytes1"
+              }
+            },
+            "value": {
+              "hexValue": "30783131",
+              "id": 2452,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "294:4:12",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_17_by_1",
+                "typeString": "int_const 17"
+              },
+              "value": "0x11"
+            },
+            "visibility": "internal"
+          }
+        ],
+        "scope": 2455,
+        "src": "113:7090:12",
+        "usedErrors": []
+      }
+    ],
+    "src": "33:7170:12"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.9+commit.e5eed63a.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.11",
+  "updatedAt": "2023-08-05T07:08:38.569Z",
+  "devdoc": {
+    "custom:security-contact": "soporte@comunyt.com",
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
