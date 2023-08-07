@@ -76,7 +76,7 @@ Pruebas:
 
 
 
-contract("test js", accounts => {
+contract("security.js", accounts => {
 
     [DEFAULT_ADMIN, PAUSER, WHITELISTER, EXCHANGER, WHITELISTED_USER1, WHITELISTED_USER2, NON_WHITELISTED_USER, HACKER, DEFAULT_ADMIN2]= accounts;
 
