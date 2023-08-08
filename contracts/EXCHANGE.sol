@@ -360,7 +360,7 @@ contract EXCHANGE is  Pausable, AccessControl, MinimalForwarder {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant WHITELISTER_ROLE = keccak256("WHITELISTER_ROLE");
     bytes32 public constant PROJECTCREATOR_ROLE = keccak256("PROJECTCREATOR_ROLE");
-    bytes32 public constant EXCHANGER_ROLE = keccak256("EXCHANGER_ROLE");
+    bytes32 public constant EXCHANGER_ROLE = keccak256("EXCHANGER_ROLE"); // se lo saque a compra() y ya no lo uso
 
 
     event ProjectAdded(address indexed whoAdded, address indexed security, uint256 indexed timestamp, string curName, address funds);
@@ -404,18 +404,20 @@ contract EXCHANGE is  Pausable, AccessControl, MinimalForwarder {
     function setLink(address _link) external onlyRole(WHITELISTER_ROLE) {
         address _owner = _msgSender();
         link[_owner]=_link;
+        link[_link]=_owner;// no debería hacer falta pero para probar ya que no me tomaba el linkeo
         emit whiteListed(_link, _owner, block.timestamp, _owner);
     }
 
     // Misma solucion anterior pero en caso de tener que hacerlo manual
     function setLinkManual(address _link, address _linksemi) external onlyRole(WHITELISTER_ROLE) {
         link[_linksemi]=_link;
+        link[_link]=_linksemi;// no debería hacer falta pero para probar ya que no me tomaba el linkeo
         emit whiteListed(_link, _linksemi, block.timestamp, _msgSender());
     }    
 
     // moneda=usdc, bonus token, securiry=swf, mdf, cantidad=10, 100 etc.
     // la cantidad mandaarlo en valor de la moneda (currency=Z usdc por ejemplo)
-    function comprar(string calldata _currency, string calldata _security, uint256 _amount) external onlyRole(EXCHANGER_ROLE) whenNotPaused  returns(bool _success) {
+    function comprar(string calldata _currency, string calldata _security, uint256 _amount) external whenNotPaused  returns(bool _success) {
         uint8 decCur = decimals[_currency];
         uint8 decSec = decimals[_security];
         if(decCur == decSec) {

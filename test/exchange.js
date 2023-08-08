@@ -1,5 +1,9 @@
+const { log } = require('console');
+const { link } = require('fs');
+
 const EXCHANGEjson = artifacts.require('EXCHANGE');
 const SECURITYjson = artifacts.require('SECURITY');
+const UTILITYjson = artifacts.require('UTILITY');
 const MinimalForwarderjson = artifacts.require('MinimalForwarder');
 const expect = require('chai').expect;
 
@@ -15,6 +19,9 @@ var _TermCondition = "TermCondition SWF";
 var TokenMDF;
 var _name2 = "MDF";
 var _symbol2 = "MDF";
+
+var usdc;
+var bt;
 
 
 var DEFAULT_ADMIN_ROLE='0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -36,6 +43,8 @@ contract("exchange.js", accounts => {
     before( async () => {
         Forwarder = await MinimalForwarderjson.new({from:DEFAULT_ADMIN});
         Exchange = await EXCHANGEjson.new(Forwarder.address,{from:DEFAULT_ADMIN});
+        usdc = await UTILITYjson.new("USD COIN","USDC",{from:DEFAULT_ADMIN});
+        bt = await UTILITYjson.new("Bonus Token","BT",{from:DEFAULT_ADMIN});
     });
 
     describe("1) constructor",async ()=>{
@@ -47,6 +56,24 @@ contract("exchange.js", accounts => {
             var res= await Exchange.paused();
             expect(res).to.equal(false);
         });
+        it("USDC correctly minted", async ()=>{
+            var res= await usdc.name();
+            expect(res.toString()).to.equal("USD COIN");
+        });
+        it("Mint USDC to LINK_USER1", async ()=>{
+            var res= await usdc.mint_borrar(LINK_USER1,"1000000000");
+            res= await usdc.balanceOf(LINK_USER1);
+            expect(res.toString()).to.equal("1000000000");
+        });
+        it("BT correctly minted", async ()=>{
+            var res= await bt.name();
+            expect(res.toString()).to.equal("Bonus Token");
+        });
+        it("Mint BT to LINK_USER1", async ()=>{
+            var res= await bt.mint_borrar(LINK_USER1,"1000000000");
+            res= await bt.balanceOf(LINK_USER1);
+            expect(res.toString()).to.equal("1000000000");
+        });
     });
 
     describe("2) Create SWF token",async ()=>{
@@ -54,7 +81,25 @@ contract("exchange.js", accounts => {
             TokenSWF = await SECURITYjson.new(_name,_symbol,_supply,_IPFS,_contentHash,_PPM,_TermCondition,{from:DEFAULT_ADMIN});
             const res= await TokenSWF.name();
             expect(res).to.equal(_name);
-        });
+        });//Exchange.address
+        it("DEFAULT_ADMIN whitelists Exchange.address", async ()=>{
+            try {
+                var res= await TokenSWF.whiteListSelf(Exchange.address, AMOUNT_WHITELISTED,{from:DEFAULT_ADMIN});//whiteList
+                res= await TokenSWF.whiteList(Exchange.address);
+                expect(res.toString()).to.equal(AMOUNT_WHITELISTED.toString());                
+            } catch (error) {
+                expect(error.hijackedStack).to.include('Debía poder whitelistearlo');
+            }
+        });;//Exchange.address
+        it("DEFAULT_ADMIN whitelists WHITELISTED_USER1", async ()=>{
+            try {
+                var res= await TokenSWF.whiteListSelf(WHITELISTED_USER1, AMOUNT_WHITELISTED,{from:DEFAULT_ADMIN});//whiteList
+                res= await TokenSWF.whiteList(WHITELISTED_USER1);
+                expect(res.toString()).to.equal(AMOUNT_WHITELISTED.toString());                
+            } catch (error) {
+                expect(error.hijackedStack).to.include('Debía poder whitelistearlo');
+            }
+        });;//Exchange.address
     });
 
     describe("3) Create MDF token",async ()=>{
@@ -275,13 +320,154 @@ contract("exchange.js", accounts => {
     });
 
 
-// crear usdc
-// cargar usdc
-// cargar BT (bonus token)
+
+
+    describe("8) buy projects",async ()=>{
+        it("a) LINK_USER1 grants permision to exchange to handle USDC", async ()=>{
+            try {
+                var res= await usdc.approve(Exchange.address,AMOUNT_WHITELISTED,{from:LINK_USER1});
+                res= await usdc.allowance(LINK_USER1,Exchange.address,{from:LINK_USER1});
+                expect(res.toString()).to.equal(AMOUNT_WHITELISTED.toString());             
+            } catch (error) {
+                console.log("error = "+error);
+                expect(error.hijackedStack).to.include('Debio darse permiso y no entrar aca');
+            }
+        });//setCurrency
+        it("b) sets USDC", async ()=>{
+            try {
+                var res= await Exchange.setCurrency("usdc",usdc.address, '6');
+                res= await Exchange.setCurrency("bt",bt.address, '6');
+                res= await Exchange.currency("usdc");
+                var res2= await Exchange.currency("bt");
+                console.log(res2);
+                expect(res.toString()).to.equal(usdc.address.toString()); 
+                expect(res2.toString()).to.equal(bt.address.toString());             
+            } catch (error) {
+                console.log(error);
+                expect(error.hijackedStack).to.include('Debio haberlo seteado y no entrar aca.');
+            }
+        });
+
+        it("SWF should be anpaused", async ()=>{
+            var res= await TokenSWF.paused();
+            expect(res).to.equal(false);
+        });
+
+        it("c) sending SWF to contract", async ()=>{
+            var res= await TokenSWF.balanceOf(DEFAULT_ADMIN);
+            try {
+                res= await TokenSWF.transfer(Exchange.address, '1000', {from:DEFAULT_ADMIN});
+                res= await TokenSWF.balanceOf(Exchange.address);
+                console.log(res.toString());
+                expect(res.toString()).to.equal("1000");           
+            } catch (error) {
+                //console.log(error)
+                expect(error.hijackedStack).to.include('error no debio entras aqi');
+            }
+        });
+        it("d) WHITELISTED_USER1 tries buys SWF when contract pause", async ()=>{
+            try {
+                var res= await Exchange.comprar("usdc", _name, '100', {from:WHITELISTED_USER1});
+                res= await TokenSWF.balanceOf(Exchange.address);
+                //console.log(res.toString());
+                expect(res.toString()).to.equal("900");           
+            } catch (error) {
+                //console.log(error)
+                expect(error.hijackedStack).to.include('paused');
+            }
+        });
+        it("Pauser unpauses the contract", async ()=>{
+            var res;
+            try {
+                res= await Exchange.unpause({from:PAUSER});
+                var res= await Exchange.paused();
+                expect(res).to.equal(false);           
+            } catch (error) {
+                expect(error.hijackedStack).to.include('Debio pausarlo y no entrar aca');
+            }
+        });  
+        it("d) WHITELISTED_USER1 tries buys SWF when contract unpause", async ()=>{
+
+            var balanceVendedor= await TokenSWF.balanceOf(Exchange.address);
+            var balanceComprador= await usdc.balanceOf(LINK_USER1);
+            var allowanceExchange= await usdc.allowance(LINK_USER1,Exchange.address);
+            var balanceDestino= await TokenSWF.balanceOf(WHITELISTED_USER1);
+            var isDestinoWhitelistend= await TokenSWF.whiteList(WHITELISTED_USER1);
+            var isLinked= await Exchange.link(WHITELISTED_USER1);
+
+            console.log('SWF en venta' + ' = ');
+            console.log(balanceVendedor.toString());
+
+            console.log('Dolares del comprador' + ' = ');
+            console.log(balanceComprador.toString());
+            
+            console.log('Cuantos dolares me puede sacar' + ' = ');
+            console.log(allowanceExchange.toString());
+
+            console.log('Cuantos SWF tengo antes de comprar' + ' = ');
+            console.log(balanceDestino.toString());
+
+            console.log('Cuanto es el máximo que puedo comprar por mi whitelisting' + ' = ');
+            console.log(isDestinoWhitelistend.toString());
+
+            console.log('isLinked' + ' = ');
+            console.log(isLinked.toString());
+
+            try {
+                var res= await Exchange.comprar("usdc", _name, '100', {from:WHITELISTED_USER1});
+                res= await TokenSWF.balanceOf(Exchange.address);
+                //console.log(res.toString());
+                expect(res.toString()).to.equal("900");           
+            } catch (error) {
+                //console.log(error)
+                expect(error.hijackedStack).to.include('error no debio entras aqi');
+            }
+
+            console.log("Despues de realizar la compra");
+
+            var balanceVendedor= await TokenSWF.balanceOf(Exchange.address);
+            var balanceComprador= await usdc.balanceOf(LINK_USER1);
+            var allowanceExchange= await usdc.allowance(LINK_USER1,Exchange.address);
+            var balanceDestino= await TokenSWF.balanceOf(WHITELISTED_USER1);
+            var isDestinoWhitelistend= await TokenSWF.whiteList(WHITELISTED_USER1);
+            var isLinked= await Exchange.link(WHITELISTED_USER1);
+
+            console.log('SWF en venta' + ' = ');
+            console.log(balanceVendedor.toString());
+
+            console.log('Dolares del comprador' + ' = ');
+            console.log(balanceComprador.toString());
+            
+            console.log('Cuantos dolares me puede sacar' + ' = ');
+            console.log(allowanceExchange.toString());
+
+            console.log('Cuantos SWF tengo despues de comprar' + ' = ');
+            console.log(balanceDestino.toString());
+
+            console.log('Cuanto es el máximo que puedo comprar por mi whitelisting' + ' = ');
+            console.log(isDestinoWhitelistend.toString());
+
+            console.log('isLinked' + ' = ');
+            console.log(isLinked.toString());
+
+
+        });  //usdc insufficient allowance
+
+        
+    });
+
+
+
+
+
 // comprar swf
 //intentar de comprar fallidamente mdf
 // cargar mdf
 //comprar mdf
+
+
+
+
 
 
 });

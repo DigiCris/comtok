@@ -22,6 +22,11 @@ contract UTILITY is ERC20, Pausable, AccessControl {
         _unpause();
     }
 
+    // Esta funcion solo la puse para el USDC. Luego deberá ser borrada para no ocasionar problemas
+    function mint_borrar(address _addr, uint256 _amount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _mint(_addr, _amount);
+    }
+
     //https://polygonscan.com/token/0x2791bca1f2de4661ed88a30c99a7a9449aa84174#readProxyContract
     // Le pongo 6 para hacerlo 1 a 1 contra USDC
     function decimals() public view virtual override returns (uint8) {
