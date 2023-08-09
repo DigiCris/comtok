@@ -401,7 +401,8 @@ contract EXCHANGE is  Pausable, AccessControl, MinimalForwarder {
     // para hacer un whitelist, la persona añade su _link custodio en donde tiene sus usdc
     //_owner es la semicustodial que firma y manda al relayer.
     // el relayer tiene whitelister_role
-    function setLink(address _link) external onlyRole(WHITELISTER_ROLE) {
+    function setLink(address _link) external {
+        require(link[_link]==address(0x0),"already registered");
         address _owner = _msgSender();
         link[_owner]=_link;
         link[_link]=_owner;// no debería hacer falta pero para probar ya que no me tomaba el linkeo

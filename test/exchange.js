@@ -297,13 +297,13 @@ contract("exchange.js", accounts => {
         });  
         it("tries auto whitelist. fail due to forwarder not a whitelister", async ()=>{
             try {
-                var res= await Exchange.setLink(WHITELISTED_USER2,{from:Forwarder.address});
-                res = await Exchange.link(Forwarder.address);
-                console.log("res"+res);
-                expect("forwared no es whitelister").to.equal("debio saltar el error.");           
+                var res= await Exchange.setLink(PAUSER,{from:HACKER});
+                res = await Exchange.link(HACKER);
+                console.log(res);
+                expect(res.toString().toLowerCase()).to.equal(PAUSER.toString().toLowerCase());           
             } catch (error) {
-                console.log("error"+error);
-                expect(error.hijackedStack).to.include('revert');
+                console.log(error);
+                expect(error.hijackedStack).to.include('reviert');
             }
         });   
         it("Auto whitelist from whitelister", async ()=>{
